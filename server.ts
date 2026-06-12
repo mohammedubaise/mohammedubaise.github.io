@@ -172,6 +172,44 @@ async function startServer() {
     next();
   });
 
+  // Helper: attempt generation with retries and model fallback
+  async function generateWithFallback(contents: any[]) {
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    const maxRetries = 2;
+
+    for (const model of models) {
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await ai!.models.generateContent({
+            model,
+            contents,
+            config: { systemInstruction: systemInstructionText }
+          });
+          return response.text;
+        } catch (err: any) {
+          const is503 = err?.message?.includes('503') || err?.status === 503 ||
+                        err?.message?.toLowerCase().includes('unavailable') ||
+                        err?.message?.toLowerCase().includes('high demand');
+          const isLastAttempt = attempt === maxRetries;
+          const isLastModel = model === models[models.length - 1];
+
+          if (is503 && !isLastAttempt) {
+            // Wait before retrying: 1s, 2s
+            await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
+            continue;
+          }
+          if (is503 && isLastAttempt && !isLastModel) {
+            // Move to next model
+            break;
+          }
+          // Non-503 error or exhausted all options — throw
+          throw err;
+        }
+      }
+    }
+    throw new Error('The AI assistant is temporarily busy. Please try again in a few seconds.');
+  }
+
   app.post('/api/chat', async (req, res) => {
     try {
       const { messages } = req.body;
@@ -182,28 +220,27 @@ async function startServer() {
 
       if (!ai) {
         return res.status(500).json({
-          error: 'GEMINI_API_KEY is not configured.'
+          error: 'GEMINI_API_KEY is not configured on the server.'
         });
       }
 
-      const contents = messages.map(msg => ({
+      const contents = messages.map((msg: any) => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: msg.content }]
       }));
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents,
-        config: {
-          systemInstruction: systemInstructionText
-        }
-      });
-
-      res.json({ text: response.text });
-    } catch (err) {
+      const text = await generateWithFallback(contents);
+      res.json({ text });
+    } catch (err: any) {
       console.error('API Error:', err);
-      res.status(500).json({
-        error: err.message || 'Server error'
+      const is503 = err?.message?.includes('503') ||
+                    err?.message?.toLowerCase().includes('unavailable') ||
+                    err?.message?.toLowerCase().includes('high demand') ||
+                    err?.message?.toLowerCase().includes('busy');
+      res.status(is503 ? 503 : 500).json({
+        error: is503
+          ? 'The AI assistant is temporarily busy due to high demand. Please try again in a few seconds.'
+          : (err.message || 'An error occurred. Please try again.')
       });
     }
   });
