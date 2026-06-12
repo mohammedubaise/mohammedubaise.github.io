@@ -87,13 +87,13 @@ const projectsList: Project[] = [
   },
   {
     id: "shuk",
-    title: "Shuk & Prep",
-    subtitle: "E-commerce Checkout & Crowdfunding Rails",
-    description: "Engineered high-conversion responsive e-commerce checkout paths for community-driven fundraising pipelines.",
+    title: "Shuk",
+    subtitle: "E-commerce Checkout Rails",
+    description: "Engineered high-conversion responsive e-commerce checkout paths for community-driven transactions.",
     techStack: ["Flutter", "Dart", "RESTful APIs", "Shared Preferences"],
     features: [
       "High-conversion secure checkout pathways",
-      "Real-time progress trackers for community donations",
+      "Real-time transaction tracking integration",
       "Offline-resilient local checkout preferences"
     ],
     image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=800&q=80",

@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Lock, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Project } from "../types";
 
 interface ProjectCardProps {
@@ -76,17 +76,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               </span>
             ))}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-          <div className="flex items-center gap-1.5 text-zinc-500 font-mono text-xs tracking-wider uppercase font-semibold">
-            <Lock className="w-3.5 h-3.5 text-cyan-400/70" />
-            NDA / Closed-Source
-          </div>
-          <span className="text-[10px] uppercase font-mono tracking-widest text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded-full border border-cyan-400/20 font-bold">
-            Published
-          </span>
         </div>
 
       </div>

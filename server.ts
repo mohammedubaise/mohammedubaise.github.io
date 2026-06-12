@@ -34,7 +34,7 @@
 //   2. **Taskde (Buyer App)**: Localized service marketplace. ZegoCloud VoIP voice streams, escrow-protected digital wallet milestones, Razorpay/PhonePe.
 //   3. **St. Paul's Student & Tutor**: Dual-app virtual classroom. Zoom SDK live stream, Chewie media playback, hardware DRM screenshot/record blockers.
 //   4. **Fizzmo**: Gamified childhood learning app. Rive 2D animations, offline caching, App Store/Play Store subscriptions, Text-to-Speech.
-//   5. **Shuk & Prep**: E-commerce checkout & crowdfunding rails. High-conversion checkout, donation trackers.
+//   5. **Shuk**: E-commerce checkout rails. High-conversion checkout.
 // - **Education**: 
 //   - Bachelor of Commerce (B.Com) - Computer Application from Calicut University.
 //   - Fullstack Development Course from First Logic Institute of Technology.
@@ -149,7 +149,7 @@ Here is essential information about Mohammed Ubaise:
   2. **Taskde (Buyer App)**: Localized service marketplace. ZegoCloud VoIP voice streams, escrow-protected digital wallet milestones, Razorpay/PhonePe.
   3. **St. Paul's Student & Tutor**: Dual-app virtual classroom. Zoom SDK live stream, Chewie media playback, hardware DRM screenshot/record blockers.
   4. **Fizzmo**: Gamified childhood learning app. Rive 2D animations, offline caching, App Store/Play Store subscriptions, Text-to-Speech.
-  5. **Shuk & Prep**: E-commerce checkout & crowdfunding rails. High-conversion checkout, donation trackers.
+  5. **Shuk**: E-commerce checkout rails. High-conversion checkout.
 - **Education**:
   - Bachelor of Commerce (B.Com) - Computer Application from Calicut University.
   - Fullstack Development Course from First Logic Institute of Technology.
