@@ -73,13 +73,15 @@ export default function Contact() {
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans mb-8">
               Available for full-time engineering capacities in high-caliber mobile applications, cross-platform UI systems architecture, and specialized SDK integrations.
             </p>
-            <a
-              href="mailto:ubaiseap35@gmail.com"
-              className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform"
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent("open-chatbot"));
+              }}
+              className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform cursor-pointer"
             >
               Start Conversation
               <Send size={12} className="text-zinc-950" />
-            </a>
+            </button>
           </div>
         </div>
 

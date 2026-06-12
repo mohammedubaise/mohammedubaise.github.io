@@ -42,6 +42,13 @@ export default function AiChatbot() {
     if (!isOpen) setError(null);
   }, [isOpen]);
 
+  // Listen for global open-chatbot event
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener("open-chatbot", handleOpen);
+    return () => window.removeEventListener("open-chatbot", handleOpen);
+  }, []);
+
   // Map any error situation to a clean, short user-facing string
   const resolveErrorMessage = (err: any, status?: number): string => {
     if (err?.name === "TypeError" || err?.message?.toLowerCase().includes("failed to fetch") || err?.message?.toLowerCase().includes("networkerror")) {
