@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;650&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Redefine zinc palette to match professional slate-blue midnight palette */
+  --color-zinc-950: #030712;
+  --color-zinc-900: #0f172a;
+  --color-zinc-850: #1e293b;
+  --color-zinc-800: #334155;
+  --color-zinc-700: #475569;
+  --color-zinc-650: #64748b;
+  --color-zinc-600: #64748b;
+  --color-zinc-550: #94a3b8;
+  --color-zinc-500: #94a3b8;
+  --color-zinc-450: #cbd5e1;
+  --color-zinc-400: #cbd5e1;
+  --color-zinc-350: #e2e8f0;
+  --color-zinc-300: #f1f5f9;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #030712;
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
+
+  /* Custom Selection Accent */
+  ::selection {
+    background-color: rgba(6, 182, 212, 0.25);
+    color: #22d3ee;
+  }
+
+  /* Beautiful Premium Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #030712;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+}
+
+/* Glassmorphism Cards Utility */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+/* Spin animation for slow rotators */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+/* Dark/Light mode overrides */
+.light {
+  body {
+    background-color: #fafafa !important;
+    color: #171717 !important;
+  }
+  
+  header {
+    background-color: rgba(250, 250, 250, 0.8) !important;
+    border-color: rgba(229, 229, 229, 0.5) !important;
+  }
+
+  #loading-screen {
+    background-color: #fafafa !important;
+  }
+
+  #loading-screen h1 {
+    color: #171717 !important;
+  }
+
+  #hero, #about, #experience, #tech, #projects, #achievements, #education, #contact {
+    background-color: #fafafa !important;
+    border-color: rgba(229, 229, 229, 1) !important;
+  }
+
+  .text-white {
+    color: #171717 !important;
+  }
+
+  .text-zinc-300 {
+    color: #262626 !important;
+  }
+
+  .text-zinc-400 {
+    color: #525252 !important;
+  }
+
+  .text-zinc-500 {
+    color: #737373 !important;
+  }
+
+  .bg-zinc-900\/40, .bg-zinc-900\/50, .bg-zinc-900\/60, .bg-zinc-900\/20 {
+    background-color: rgba(245, 245, 245, 0.8) !important;
+    border-color: rgba(229, 229, 229, 0.8) !important;
+  }
+
+  .bg-zinc-950 {
+    background-color: #f5f5f5 !important;
+  }
+
+  .border-zinc-800, .border-zinc-850, .border-zinc-800\/80, .border-zinc-900, .border-zinc-900\/60, .border-zinc-850\/40 {
+    border-color: rgba(229, 229, 229, 1) !important;
+  }
+
+  .text-zinc-350 {
+    color: #404040 !important;
+  }
+
+  .bg-zinc-900 {
+    background-color: #e5e5e5 !important;
+    border-color: #d4d4d4 !important;
+  }
+
+  #mobile-menu {
+    background-color: #fafafa !important;
+  }
+
+  #scroll-progress {
+    background-color: #e5e5e5 !important;
+  }
+
+  #radar-chart text {
+    fill: #525252 !important;
+  }
+
+  #radar-chart .stroke-zinc-800 {
+    stroke: #e5e5e5 !important;
+  }
+
+  #radar-chart .stroke-zinc-800\/60 {
+    stroke: #d4d4d4 !important;
+  }
+
+  #radar-chart circle {
+    stroke: #fafafa !important;
+  }
+}
+
