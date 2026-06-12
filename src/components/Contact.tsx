@@ -1,9 +1,11 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, Phone, Mail, Github, Linkedin, MessageSquare, Check, Sparkles } from "lucide-react";
 import { API_BASE_URL } from "../config";
 
 export default function Contact() {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
   // Form submission states
   const [formData, setFormData] = useState({
     name: "",
@@ -13,21 +15,12 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showEmailCopied, setShowEmailCopied] = useState(false);
 
   const handleStartConversation = () => {
-    // Attempt mailto redirect
-    window.location.href = "mailto:ubaiseap35@gmail.com?subject=Project%20Collaboration";
-
-    // Copy email as a fallback
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText("ubaiseap35@gmail.com")
-        .then(() => {
-          setShowEmailCopied(true);
-          setTimeout(() => setShowEmailCopied(false), 3000);
-        })
-        .catch(() => {});
-    }
+    nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 400);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -89,27 +82,13 @@ export default function Contact() {
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans mb-8">
               Available for full-time engineering capacities in high-caliber mobile applications, cross-platform UI systems architecture, and specialized SDK integrations.
             </p>
-            <div className="relative flex flex-col items-center">
-              <button
-                onClick={handleStartConversation}
-                className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform cursor-pointer"
-              >
-                Start Conversation
-                <Send size={12} className="text-zinc-950" />
-              </button>
-              <AnimatePresence>
-                {showEmailCopied && (
-                  <motion.span
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute -bottom-8 text-[11px] text-cyan-400 font-mono"
-                  >
-                    Email copied to clipboard as fallback!
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
+            <button
+              onClick={handleStartConversation}
+              className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform cursor-pointer"
+            >
+              Start Conversation
+              <Send size={12} className="text-zinc-950" />
+            </button>
           </div>
         </div>
 
@@ -207,6 +186,7 @@ export default function Contact() {
                       Your Name *
                     </label>
                     <input
+                      ref={nameInputRef}
                       type="text"
                       required
                       placeholder="e.g. Liam Johnson"
