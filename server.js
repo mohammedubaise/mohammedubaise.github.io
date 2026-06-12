@@ -20,6 +20,15 @@ You speak in first person as Mohammed Ubaise and maintain a professional, concis
 async function startServer() {
   const app = express();
   app.use(express.json());
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
   app.post("/api/chat", async (req, res) => {
     try {
       const { messages } = req.body;

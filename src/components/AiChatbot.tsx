@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, X, Sparkles, BrainCircuit, Bot, User, AlertCircle, Key } from "lucide-react";
+import { API_BASE_URL } from "../config";
 
 interface Message {
   role: "user" | "assistant";
@@ -64,7 +65,7 @@ export default function AiChatbot() {
         headers["x-gemini-key"] = localApiKey;
       }
 
-      const res = await fetch("/api/chat", {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
         headers,
         body: JSON.stringify({ messages: updatedMessages }),

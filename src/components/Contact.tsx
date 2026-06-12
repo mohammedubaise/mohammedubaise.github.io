@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, Phone, Mail, Github, Linkedin, MessageSquare, Check, Sparkles } from "lucide-react";
+import { API_BASE_URL } from "../config";
 
 export default function Contact() {
   // Form submission states
@@ -19,7 +20,7 @@ export default function Contact() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
