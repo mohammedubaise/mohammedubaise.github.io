@@ -42,13 +42,6 @@ export default function AiChatbot() {
     if (!isOpen) setError(null);
   }, [isOpen]);
 
-  // Listen for global open-chatbot event
-  useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
-    window.addEventListener("open-chatbot", handleOpen);
-    return () => window.removeEventListener("open-chatbot", handleOpen);
-  }, []);
-
   // Map any error situation to a clean, short user-facing string
   const resolveErrorMessage = (err: any, status?: number): string => {
     if (err?.name === "TypeError" || err?.message?.toLowerCase().includes("failed to fetch") || err?.message?.toLowerCase().includes("networkerror")) {
@@ -185,9 +178,8 @@ export default function AiChatbot() {
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex gap-3 max-w-[85%] ${
-                    msg.role === "user" ? "self-end flex-row-reverse" : "self-start"
-                  }`}
+                  className={`flex gap-3 max-w-[85%] ${msg.role === "user" ? "self-end flex-row-reverse" : "self-start"
+                    }`}
                 >
                   {/* Avatar bubble */}
                   {msg.role === "user" ? (
@@ -204,11 +196,10 @@ export default function AiChatbot() {
 
                   {/* Bubble text */}
                   <div
-                    className={`rounded-2xl px-4 py-3 text-xs sm:text-xs leading-relaxed text-left font-sans ${
-                      msg.role === "user"
+                    className={`rounded-2xl px-4 py-3 text-xs sm:text-xs leading-relaxed text-left font-sans ${msg.role === "user"
                         ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-none shadow-lg shadow-blue-500/5"
                         : "bg-zinc-900/80 border border-zinc-850/60 text-zinc-300 rounded-tl-none"
-                    }`}
+                      }`}
                   >
                     {msg.content}
                   </div>

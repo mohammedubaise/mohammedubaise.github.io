@@ -1,11 +1,9 @@
-import { useState, FormEvent, useRef } from "react";
+import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, Phone, Mail, Github, Linkedin, MessageSquare, Check, Sparkles } from "lucide-react";
 import { API_BASE_URL } from "../config";
 
 export default function Contact() {
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
   // Form submission states
   const [formData, setFormData] = useState({
     name: "",
@@ -15,13 +13,6 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleStartConversation = () => {
-    nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => {
-      nameInputRef.current?.focus();
-    }, 400);
-  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,7 +54,7 @@ export default function Contact() {
       <div className="absolute top-1/4 left-[10%] w-96 h-96 bg-violet-600/5 blur-[120px] pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
-        
+
         {/* BIG GLOWING CTA HEADER SECTION */}
         <div className="w-full text-center py-16 px-6 sm:px-12 bg-gradient-to-br from-indigo-950/40 via-violet-950/20 to-zinc-950/60 border border-zinc-800/80 rounded-3xl relative overflow-hidden backdrop-blur-xl mb-20 group">
           {/* Subtle neon accents */}
@@ -82,13 +73,13 @@ export default function Contact() {
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans mb-8">
               Available for full-time engineering capacities in high-caliber mobile applications, cross-platform UI systems architecture, and specialized SDK integrations.
             </p>
-            <button
-              onClick={handleStartConversation}
-              className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform cursor-pointer"
+            <a
+              href="mailto:ubaiseap35@gmail.com"
+              className="px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-150 text-zinc-950 font-mono text-xs tracking-wider uppercase font-semibold flex items-center gap-2 active:scale-95 transition-transform"
             >
               Start Conversation
               <Send size={12} className="text-zinc-950" />
-            </button>
+            </a>
           </div>
         </div>
 
@@ -106,7 +97,7 @@ export default function Contact() {
 
         {/* Split Grid: Left Details & External CTAs vs Right in-page Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
+
           {/* LEFT CHANNELS AND ACTION BUTTONS */}
           <div className="lg:col-span-5 flex flex-col gap-6 text-left">
             <div>
@@ -178,7 +169,7 @@ export default function Contact() {
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4 font-mono">
-                
+
                 {/* Input row Name / Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -186,7 +177,6 @@ export default function Contact() {
                       Your Name *
                     </label>
                     <input
-                      ref={nameInputRef}
                       type="text"
                       required
                       placeholder="e.g. Liam Johnson"
