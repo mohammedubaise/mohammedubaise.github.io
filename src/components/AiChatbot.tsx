@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Send, X, Sparkles, BrainCircuit, Bot, User, AlertCircle, Key } from "lucide-react";
+import { Send, X, Sparkles, User, AlertCircle } from "lucide-react";
 import { API_BASE_URL } from "../config";
 
 interface Message {
@@ -20,16 +20,13 @@ export default function AiChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I am Ubaise Assistant, Mohammed Ubaise's digital avatar. Feel free to ask me anything about my mobile development skills, projects, or how we can collaborate!",
+      content:
+        "Hi! I am Ubaise Assistant, Mohammed Ubaise's digital avatar. Feel free to ask me anything about my mobile development skills, projects, or how we can collaborate!",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Custom API key input for local testing fallback
-  const [localApiKey, setLocalApiKey] = useState(() => localStorage.getItem("local_gemini_key") || "");
-  const [showKeyInput, setShowKeyInput] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +37,7 @@ export default function AiChatbot() {
     }
   }, [messages, isLoading, isOpen]);
 
-  // Reset error when toggled
+  // Reset error when closed
   useEffect(() => {
     if (!isOpen) setError(null);
   }, [isOpen]);
@@ -56,25 +53,16 @@ export default function AiChatbot() {
     setError(null);
 
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-
-      // If user supplied their own key locally, send it in headers
-      if (localApiKey.trim()) {
-        headers["x-gemini-key"] = localApiKey;
-      }
-
       const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
-        headers,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: updatedMessages }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to retrieve response from server.");
+        throw new Error(data.error || "Failed to get a response. Please try again.");
       }
 
       setMessages((prev) => [
@@ -83,32 +71,15 @@ export default function AiChatbot() {
       ]);
     } catch (err: any) {
       console.error("Chat Error:", err);
-      setError(err.message || "Something went wrong. Please check your connection.");
+      setError(err.message || "Something went wrong. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    handleSendMessage(suggestion);
-  };
-
-  const handleSaveApiKey = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem("local_gemini_key", localApiKey);
-    setShowKeyInput(false);
-    setError(null);
-  };
-
-  const handleClearApiKey = () => {
-    localStorage.removeItem("local_gemini_key");
-    setLocalApiKey("");
-    setError(null);
-  };
-
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      
+
       {/* 1. CHAT PANEL */}
       <AnimatePresence>
         {isOpen && (
@@ -136,77 +107,19 @@ export default function AiChatbot() {
                     <Sparkles className="w-3 h-3 text-cyan-400" />
                   </span>
                   <span className="text-[9px] font-mono text-cyan-400 font-semibold tracking-widest uppercase">
-                    Online & Ready
+                    Online &amp; Ready
                   </span>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-1.5">
-                {/* Local API Key Settings Button */}
-                <button
-                  onClick={() => setShowKeyInput(!showKeyInput)}
-                  className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                    localApiKey
-                      ? "border-emerald-500/30 text-emerald-400 bg-emerald-950/20 hover:bg-emerald-900/30"
-                      : "border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
-                  }`}
-                  title={localApiKey ? "Gemini Key Saved (Local)" : "Set Custom Gemini Key"}
-                >
-                  <Key size={13} />
-                </button>
-                
-                {/* Close Button */}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors cursor-pointer"
-                >
-                  <X size={13} />
-                </button>
-              </div>
-            </div>
 
-            {/* API Key Modal Overlay inside panel */}
-            <AnimatePresence>
-              {showKeyInput && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute inset-x-0 top-[69px] bg-[#090d16] border-b border-zinc-850 p-4 z-20 text-left font-sans text-xs"
-                >
-                  <h4 className="font-semibold text-white mb-1.5 flex items-center gap-1.5">
-                    <Key size={12} className="text-cyan-400" />
-                    Local Testing Fallback
-                  </h4>
-                  <p className="text-zinc-400 text-[10px] leading-relaxed mb-3">
-                    If `GEMINI_API_KEY` is not defined in your server environment, you can input your key below to save it in browser storage.
-                  </p>
-                  <form onSubmit={handleSaveApiKey} className="flex gap-2 mb-2">
-                    <input
-                      type="password"
-                      placeholder="Paste Gemini API Key..."
-                      value={localApiKey}
-                      onChange={(e) => setLocalApiKey(e.target.value)}
-                      className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-300 focus:outline-none focus:border-cyan-500"
-                    />
-                    <button
-                      type="submit"
-                      className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-[10px] font-bold rounded-lg uppercase cursor-pointer"
-                    >
-                      Save
-                    </button>
-                  </form>
-                  {localApiKey && (
-                    <button
-                      onClick={handleClearApiKey}
-                      className="text-[9px] text-rose-400 hover:underline font-mono"
-                    >
-                      Clear Saved Key
-                    </button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+              {/* Close Button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors cursor-pointer"
+              >
+                <X size={13} />
+              </button>
+            </div>
 
             {/* Chat Messages Body */}
             <div className="flex-grow overflow-y-auto px-5 py-4 space-y-4 flex flex-col scrollbar-thin">
@@ -229,7 +142,7 @@ export default function AiChatbot() {
                       className="w-6 h-6 rounded-lg object-cover border border-white/5 shadow-md shrink-0"
                     />
                   )}
-                  
+
                   {/* Bubble text */}
                   <div
                     className={`rounded-2xl px-4 py-3 text-xs sm:text-xs leading-relaxed text-left font-sans ${
@@ -266,17 +179,6 @@ export default function AiChatbot() {
                   <div>
                     <span className="font-semibold block mb-0.5">Connection Error</span>
                     {error}
-                    {!localApiKey && (
-                      <button
-                        onClick={() => {
-                          setShowKeyInput(true);
-                          setError(null);
-                        }}
-                        className="block mt-1.5 text-cyan-400 hover:underline font-mono text-[9px] uppercase tracking-wider"
-                      >
-                        Enter Key Manually
-                      </button>
-                    )}
                   </div>
                 </div>
               )}
@@ -291,7 +193,7 @@ export default function AiChatbot() {
                 {suggestions.map((sug) => (
                   <button
                     key={sug}
-                    onClick={() => handleSuggestionClick(sug)}
+                    onClick={() => handleSendMessage(sug)}
                     className="text-[10px] text-left text-zinc-400 hover:text-cyan-400 bg-zinc-900/40 border border-zinc-850/60 hover:border-cyan-500/30 px-2.5 py-1 rounded-xl transition-all cursor-pointer font-sans"
                   >
                     {sug}
@@ -338,7 +240,7 @@ export default function AiChatbot() {
       >
         {/* Ring glow effect */}
         <span className="absolute inset-0 rounded-full border border-cyan-400 opacity-20 group-hover:scale-110 transition-transform duration-300" />
-        
+
         {isOpen ? (
           <X size={20} className="text-white" />
         ) : (
@@ -352,7 +254,7 @@ export default function AiChatbot() {
           </div>
         )}
       </motion.button>
-      
+
     </div>
   );
 }
