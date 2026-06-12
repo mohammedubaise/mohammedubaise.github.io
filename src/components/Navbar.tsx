@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, Sun, Moon, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 
 interface NavbarProps {
-  theme: "dark" | "light";
-  toggleTheme: () => void;
   activeSection: string;
   scrollToSection: (id: string) => void;
 }
@@ -19,8 +17,6 @@ const navLinks = [
 ];
 
 export default function Navbar({
-  theme,
-  toggleTheme,
   activeSection,
   scrollToSection,
 }: NavbarProps) {
@@ -47,7 +43,7 @@ export default function Navbar({
   return (
     <>
       {/* Scroll Progress Indicator */}
-      <div className="fixed top-0 left-0 w-full h-[3px] bg-zinc-900 z-[99]" id="scroll-progress">
+      <div className="fixed top-0 left-0 w-full h-[3px] bg-zinc-900/40 z-[99]" id="scroll-progress">
         <div
           className="h-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-400"
           style={{ width: `${scrollProgress}%` }}
@@ -57,7 +53,7 @@ export default function Navbar({
       <header
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           isScrolled
-            ? "py-3 bg-zinc-950/80 dark:bg-zinc-950/70 border-b border-zinc-800/40 backdrop-blur-xl"
+            ? "py-3 bg-zinc-950/80 border-b border-zinc-800/40 backdrop-blur-xl"
             : "py-5 bg-transparent border-b border-transparent"
         }`}
       >
@@ -81,7 +77,7 @@ export default function Navbar({
               </span>
             </div>
           </button>
-
+ 
           {/* Desktop Navigation Link Cluster */}
           <nav className="hidden md:flex items-center gap-7 bg-zinc-900/30 border border-zinc-800/60 rounded-full px-6 py-2 backdrop-blur-md">
             {navLinks.map((link) => {
@@ -106,18 +102,9 @@ export default function Navbar({
               );
             })}
           </nav>
-
-          {/* Actions: Theme Switcher & Contact Button */}
+ 
+          {/* Actions: Contact Button */}
           <div className="flex items-center gap-3">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-950 dark:bg-zinc-900/40 text-zinc-400 hover:text-white hover:scale-105 transition-all duration-150 cursor-pointer"
-              title={theme === "dark" ? "Toggle Light Mode" : "Toggle Dark Mode"}
-            >
-              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-            </button>
-
             {/* Quick Contact Accent Link */}
             <button
               onClick={() => scrollToSection("contact")}
@@ -126,11 +113,11 @@ export default function Navbar({
               Hire Me
               <Sparkles size={12} className="text-cyan-400 animate-pulse" />
             </button>
-
+ 
             {/* Hamburger Mobile controls */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-950 dark:bg-zinc-900/40 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="md:hidden p-2.5 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-950 text-zinc-400 hover:text-white transition-colors cursor-pointer"
             >
               {mobileMenuOpen ? <X size={15} /> : <Menu size={15} />}
             </button>

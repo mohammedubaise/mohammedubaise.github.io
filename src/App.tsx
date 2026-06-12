@@ -103,23 +103,9 @@ const projectsList: Project[] = [
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [activeSection, setActiveSection] = useState("hero");
   const [projectFilter, setProjectFilter] = useState<"all" | "enterprise" | "ecommerce" | "education" | "gamified">("all");
   const [isBackToTopVisible, setIsBackToTopVisible] = useState(false);
-
-  // Toggle Theme Utility
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      if (next === "light") {
-        document.documentElement.classList.add("light");
-      } else {
-        document.documentElement.classList.remove("light");
-      }
-      return next;
-    });
-  };
 
   // Section observer for Navigation highlight
   useEffect(() => {
@@ -160,7 +146,7 @@ export default function App() {
   });
 
   return (
-    <div className={`min-h-screen text-white select-none ${theme === "dark" ? "bg-zinc-950" : "bg-neutral-50 text-zinc-900"}`}>
+    <div className="min-h-screen text-white select-none bg-zinc-950">
       
       {/* Custom Mouse Cursor (2026 aim-reticle design with neon indicators) */}
       <CustomCursor />
@@ -176,8 +162,6 @@ export default function App() {
           
           {/* Header & Sticky Nav overlay */}
           <Navbar
-            theme={theme}
-            toggleTheme={toggleTheme}
             activeSection={activeSection}
             scrollToSection={scrollToSection}
           />
