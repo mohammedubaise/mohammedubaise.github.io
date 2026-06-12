@@ -172,13 +172,21 @@ async function startServer() {
     next();
   });
 
+  // Helper: classify error type
+  function classifyError(err: any): 'quota' | 'overload' | 'other' {
+    const msg = (err?.message || '').toLowerCase();
+    const code = err?.code || err?.status || '';
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted') || String(code) === '429') return 'quota';
+    if (msg.includes('503') || msg.includes('unavailable') || msg.includes('high demand') || String(code) === '503') return 'overload';
+    return 'other';
+  }
+
   // Helper: attempt generation with retries and model fallback
   async function generateWithFallback(contents: any[]) {
     const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
-    const maxRetries = 2;
 
     for (const model of models) {
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      for (let attempt = 0; attempt <= 2; attempt++) {
         try {
           const response = await ai!.models.generateContent({
             model,
@@ -187,27 +195,29 @@ async function startServer() {
           });
           return response.text;
         } catch (err: any) {
-          const is503 = err?.message?.includes('503') || err?.status === 503 ||
-                        err?.message?.toLowerCase().includes('unavailable') ||
-                        err?.message?.toLowerCase().includes('high demand');
-          const isLastAttempt = attempt === maxRetries;
-          const isLastModel = model === models[models.length - 1];
+          const type = classifyError(err);
 
-          if (is503 && !isLastAttempt) {
-            // Wait before retrying: 1s, 2s
-            await new Promise(r => setTimeout(r, (attempt + 1) * 1000));
-            continue;
+          // Quota exhausted — no point retrying, throw immediately
+          if (type === 'quota') {
+            throw Object.assign(new Error('quota'), { type: 'quota' });
           }
-          if (is503 && isLastAttempt && !isLastModel) {
-            // Move to next model
+
+          // Overload (503) — retry with backoff, then try next model
+          if (type === 'overload') {
+            if (attempt < 2) {
+              await new Promise(r => setTimeout(r, (attempt + 1) * 1200));
+              continue;
+            }
+            // Exhausted retries for this model, try next
             break;
           }
-          // Non-503 error or exhausted all options — throw
+
+          // Any other error — throw as-is
           throw err;
         }
       }
     }
-    throw new Error('The AI assistant is temporarily busy. Please try again in a few seconds.');
+    throw Object.assign(new Error('overload'), { type: 'overload' });
   }
 
   app.post('/api/chat', async (req, res) => {
@@ -219,9 +229,7 @@ async function startServer() {
       }
 
       if (!ai) {
-        return res.status(500).json({
-          error: 'GEMINI_API_KEY is not configured on the server.'
-        });
+        return res.status(500).json({ error: 'AI service is not configured on the server.' });
       }
 
       const contents = messages.map((msg: any) => ({
@@ -231,16 +239,24 @@ async function startServer() {
 
       const text = await generateWithFallback(contents);
       res.json({ text });
+
     } catch (err: any) {
-      console.error('API Error:', err);
-      const is503 = err?.message?.includes('503') ||
-                    err?.message?.toLowerCase().includes('unavailable') ||
-                    err?.message?.toLowerCase().includes('high demand') ||
-                    err?.message?.toLowerCase().includes('busy');
-      res.status(is503 ? 503 : 500).json({
-        error: is503
-          ? 'The AI assistant is temporarily busy due to high demand. Please try again in a few seconds.'
-          : (err.message || 'An error occurred. Please try again.')
+      console.error('API Error:', err?.message || err);
+
+      if (err?.type === 'quota' || classifyError(err) === 'quota') {
+        return res.status(429).json({
+          error: 'The AI assistant has reached its daily usage limit. Please try again tomorrow or contact Mohammed Ubaise directly at ubaiseap35@gmail.com'
+        });
+      }
+
+      if (err?.type === 'overload' || classifyError(err) === 'overload') {
+        return res.status(503).json({
+          error: 'The AI assistant is temporarily busy. Please try again in a few seconds.'
+        });
+      }
+
+      res.status(500).json({
+        error: 'Something went wrong. Please try again or contact Mohammed Ubaise directly.'
       });
     }
   });
