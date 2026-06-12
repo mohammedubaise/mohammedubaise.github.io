@@ -42,6 +42,26 @@ export default function AiChatbot() {
     if (!isOpen) setError(null);
   }, [isOpen]);
 
+  // Map any error situation to a clean, short user-facing string
+  const resolveErrorMessage = (err: any, status?: number): string => {
+    if (err?.name === "TypeError" || err?.message?.toLowerCase().includes("failed to fetch") || err?.message?.toLowerCase().includes("networkerror")) {
+      return "No connection to the server. Check your internet and try again.";
+    }
+    if (err?.name === "AbortError") {
+      return "The request timed out. Please try again.";
+    }
+    if (status === 429) {
+      return "The AI assistant has reached its daily usage limit. Try again tomorrow or email ubaiseap35@gmail.com directly.";
+    }
+    if (status === 503) {
+      return "The AI assistant is temporarily busy. Please try again in a few seconds.";
+    }
+    if (err?.message && !err.message.startsWith("{") && err.message.length < 300) {
+      return err.message;
+    }
+    return "Something went wrong. Please try again or contact Mohammed Ubaise directly.";
+  };
+
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
@@ -52,30 +72,62 @@ export default function AiChatbot() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
-      });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
-      const data = await res.json();
+    let status: number | undefined;
+
+    try {
+      let res: Response;
+      try {
+        res = await fetch(`${API_BASE_URL}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: updatedMessages }),
+          signal: controller.signal,
+        });
+      } catch (networkErr: any) {
+        throw { _network: true, name: networkErr.name, message: networkErr.message };
+      } finally {
+        clearTimeout(timeout);
+      }
+
+      status = res.status;
+
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        // Response body not valid JSON
+        throw { message: "Unexpected response from server. Please try again." };
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to get a response. Please try again.");
+        // Server sent a clean error string — use it if it looks safe
+        const serverMsg = typeof data?.error === "string" && !data.error.startsWith("{") && data.error.length < 400
+          ? data.error
+          : resolveErrorMessage({}, status);
+        throw { message: serverMsg, _status: status };
+      }
+
+      if (!data?.text) {
+        throw { message: "No response received from the assistant. Please try again." };
       }
 
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.text },
       ]);
+
     } catch (err: any) {
       console.error("Chat Error:", err);
-      setError(err.message || "Something went wrong. Please check your connection and try again.");
+      const finalStatus = err?._status ?? status;
+      setError(resolveErrorMessage(err, finalStatus));
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
